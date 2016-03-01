@@ -14,7 +14,7 @@ Senzory budú získavať tieto údaje:
 	Priame svetlo,
 	Hlučnosť,
 	Množstvo smogu,
-	Poloha senzorov,
+	Poloha senzorov
 
 	
 Činnosti - Časová náročnosť
