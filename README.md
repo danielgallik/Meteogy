@@ -27,22 +27,32 @@ Senzory budú získavať tieto údaje:
 	7. Výpočet ostatných bodov v mape
 	8. Grafické zobrazenie
 
+
 Iteracia 1 - 22 hodin
+
+
 1.	Vytvorit webove rozhranie – 2 hod
 2.	Dopyty na databazu – 6 hod
 3.	Zobrazenie 2D mapy – 4 hod
 4.	Vizualizacia udajov na 2d mape(podla GPS a velkosty okruhu) – 10 hod
 
+
 Iteracia 2 - 32 hodin
+
+
 5.	Odhadnutie hodnot aj pre nemonitorovane oblasti – 20 hod
 6.	Volba parametrov zobrazovania(Vlhkosť (pôdy/vzduchu), Teplota (denná/nočná), Rýchlosť vetra, Zrazky, Kvalita pody, Priame svetlo, Hlučnosť, Množstvo smogu) – 8 hod
 7.	Nastavenie idealnych hodnot podla jednotlivych fatorov – 4 hod
 
+
 Iteracia 3 - 18 hodin
+
+
 8.	Voľba podla časoveho rozmedzia(datum od do) – 4 hod
 9.	Zvolenie dolezitych faktorov – 4 hod
 10.	Validacia vstupov z formularov – 9 hod
 11.	Zobrazenie legendy k mape – 1 hod
+
 
 Spolu - 72 hodin
 
