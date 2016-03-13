@@ -53,8 +53,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="CalculatorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="MapBuilderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Meteogy.Engine\Meteogy.Engine.csproj">
