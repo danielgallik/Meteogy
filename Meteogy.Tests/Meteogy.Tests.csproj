@@ -62,7 +62,7 @@
       <Name>Meteogy.Engine</Name>
     </ProjectReference>
     <ProjectReference Include="..\Meteogy\Meteogy.csproj">
-      <Project>{4adb6766-c4e8-45dd-8500-e132e1e422de}</Project>
+      <Project>{ac77c171-06e0-4c52-b824-74df0a08d5c0}</Project>
       <Name>Meteogy</Name>
     </ProjectReference>
   </ItemGroup>
