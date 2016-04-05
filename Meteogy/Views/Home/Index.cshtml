@@ -1,0 +1,133 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="row">
+    <div class="col-md-9">
+        <h1>Map</h1>
+        <div id="map" style="width:100%; height:400px;"></div>
+        <div style="text-align:center; padding: 10px 0;">
+            <canvas id="UI_Canvas" style="width:500px; height:250px; border: solid 2px #CCC; margin: 0 auto;"></canvas>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <h1>Parameters</h1>
+        <form>
+            <div class="form-group">
+                <label for="UI_Lat">Latitude</label>
+                <input type="text" class="form-control" id="UI_Lat" placeholder="Latitude">
+            </div>
+            <div class="form-group">
+                <label for="UI_Lng">Longitude</label>
+                <input type="text" class="form-control" id="UI_Lng" placeholder="Longitude">
+            </div>
+            <div class="form-group">
+                <label for="UI_Width">Width</label>
+                <input type="text" class="form-control" id="UI_Width" placeholder="Width">
+            </div>
+            <div class="form-group">
+                <label for="UI_Height">Height</label>
+                <input type="text" class="form-control" id="UI_Height" placeholder="Height">
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        var rectangle;
+        var map;
+        var centerLatLng = { lat: 48.6688584, lng: 19.6950909 };
+        var height = 1.95;
+        var width = 5.9;
+
+        $(document).ready(function () {
+            var jsonObject = {};
+
+
+            $.ajax({
+                url: "@Url.Action("GetColorMap")",
+                type: "POST",
+                data: JSON.stringify(jsonObject),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                error: function (response) {
+                    alert(response.responseText);
+                },
+                success: function (response) {
+                    Draw(response.data);
+                }
+            });
+        });
+
+        function Draw(data) {
+            var canvas = document.getElementById("UI_Canvas");
+            var ctx = canvas.getContext("2d");
+
+            var rectHeight = canvas.height / data.length;
+            var rectWidth = canvas.width / data[0].length;
+            for (var i = 0; i < data.length; i++)
+            {
+                for (var j = 0; j < data[i].length; j++) {
+                    ctx.fillStyle = "rgb(" + (data[i][j] * 10).toString() + ",0,0)";
+                    ctx.fillRect(j * rectWidth, i * rectHeight, rectWidth, rectHeight);
+                }
+            }
+            
+        }
+
+        function calculateBounds() {
+            return {
+                south: centerLatLng.lat - height / 2,
+                north: centerLatLng.lat + height / 2,
+                west: centerLatLng.lng - width / 2,
+                east: centerLatLng.lng + width / 2
+            };
+        }
+
+        function updateForm() {
+            document.getElementById('UI_Lat').value = centerLatLng.lat;
+            document.getElementById('UI_Lng').value = centerLatLng.lng;
+            document.getElementById('UI_Width').value = width;
+            document.getElementById('UI_Height').value = height;
+        }
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: centerLatLng,
+                zoom: 7,
+                mapTypeId: google.maps.MapTypeId.TERRAIN
+            });
+
+            rectangle = new google.maps.Rectangle({
+                bounds: calculateBounds(),
+                editable: true,
+                draggable: true
+            });
+            rectangle.setMap(map);
+            rectangle.addListener('bounds_changed', function (event) {
+                var ne = rectangle.getBounds().getNorthEast();
+                var sw = rectangle.getBounds().getSouthWest();
+                centerLatLng.lat = sw.lat() + height / 2;
+                centerLatLng.lng = sw.lng() + width / 2;
+                height = ne.lat() - sw.lat();
+                width = ne.lng() - sw.lng();
+                updateForm();
+            });
+
+            map.addListener('click', function (event) {
+                centerLatLng.lat = event.latLng.lat();
+                centerLatLng.lng = event.latLng.lng();
+                var ne = rectangle.getBounds().getNorthEast();
+                var sw = rectangle.getBounds().getSouthWest();
+                height = ne.lat() - sw.lat();
+                width = ne.lng() - sw.lng();
+                rectangle.setBounds(calculateBounds());
+                updateForm();
+            });
+
+            updateForm();
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?callback=initMap" async defer></script>
+}

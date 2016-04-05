@@ -61,10 +61,6 @@
       <Project>{05bb1adc-25db-40d3-a82e-2d06536d8c69}</Project>
       <Name>Meteogy.Engine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Meteogy\Meteogy.csproj">
-      <Project>{ac77c171-06e0-4c52-b824-74df0a08d5c0}</Project>
-      <Name>Meteogy</Name>
-    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
