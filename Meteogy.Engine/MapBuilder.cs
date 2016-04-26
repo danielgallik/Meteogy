@@ -28,9 +28,9 @@ namespace Meteogy.Engine
         {
             width = (width < MIN_WIDTH) ? MIN_WIDTH : width;
             height = (width < MIN_HEIGHT) ? MIN_HEIGHT : height;
-            
+
             map = new double[width, height];
-            
+
             corners = new GeoCoordinate[2];
             corners[0] = leftBot;
             corners[1] = rightTop;
@@ -38,16 +38,39 @@ namespace Meteogy.Engine
 
         public bool Insert(GeoCoordinate coordinate, double value)
         {
-            if (coordinate.Latitude < corners[0].Latitude ||
-                coordinate.Latitude > corners[1].Latitude ||
-                coordinate.Longitude < corners[0].Longitude ||
-                coordinate.Longitude > corners[1].Longitude)
+            if (!IsValidEntry(coordinate))
             {
                 return false;
             }
-            
+            Tuple<int, int> key = CalculPosition(coordinate);
+            if (!points.ContainsKey(key))
+            {
+                points.Add(key, new List<double>());
+            }
+            points[key].Add(value);
+            foreach (KeyValuePair<Tuple<int, int>, List<double>> point in points)
+            {
+                Tuple<int, int> position = point.Key;
+                List<double> values = point.Value;
+                int countOfValues = values.Count;
+                double average = Math.Round(point.Value.Take(countOfValues).Sum() / countOfValues, 2, MidpointRounding.AwayFromZero);
+                map[position.Item1, position.Item2] = average;
+            }
+            return true;
+        }
+
+        public bool IsValidEntry(GeoCoordinate coordinate)
+        {
+            return (coordinate.Latitude >= corners[0].Latitude &&
+                    coordinate.Latitude <= corners[1].Latitude &&
+                    coordinate.Longitude >= corners[0].Longitude &&
+                    coordinate.Longitude <= corners[1].Longitude);
+        }
+
+        public Tuple<int, int> CalculPosition(GeoCoordinate coordinate)
+        {
             double deltaX = corners[1].Latitude - corners[0].Latitude;
-            double deltaY= corners[1].Longitude - corners[0].Longitude;
+            double deltaY = corners[1].Longitude - corners[0].Longitude;
 
             double startX = coordinate.Latitude - corners[0].Latitude;
             double startY = coordinate.Longitude - corners[0].Longitude;
@@ -60,28 +83,58 @@ namespace Meteogy.Engine
 
             int positionX = (int)Math.Round((startX / stepX), MidpointRounding.AwayFromZero);
             int positionY = (int)Math.Round((map.GetLength(0) - (startY / stepY)) - 1, MidpointRounding.AwayFromZero);
-            
-            Tuple<int, int> key = new Tuple<int, int>(positionY, positionX);
-            
-            if (!points.ContainsKey(key))
+
+            return new Tuple<int, int>(positionY, positionX);
+        }
+
+        public void SpreadPoints()
+        {
+            for (int i = 0; i < map.GetLength(0); i++)
             {
-                points.Add(key, new List<double>());
+                for (int j = 0; j < map.GetLength(1); j++)
+                {
+                    map[i, j] = CalculCorrectPoint(i, j);       
+                    Console.WriteLine(map[i,j]);
+                }
             }
+        }
 
-            points[key].Add(value);
-
+        public double CalculCorrectPoint(int i, int j)
+        {
+            double count = 0;
+            double average = 0;
             foreach (KeyValuePair<Tuple<int, int>, List<double>> point in points)
             {
                 Tuple<int, int> position = point.Key;
                 List<double> values = point.Value;
-                int countOfValues = values.Count;
-                double average = Math.Round(point.Value.Take(countOfValues).Sum() / countOfValues, 2, MidpointRounding.AwayFromZero);
-
-                map[position.Item1, position.Item2] = average;
+                double distinct = Math.Abs(i - position.Item1) + Math.Abs(j-position.Item2);
+                if (distinct == 0)
+                {
+                    return AverageOfSensor(values);
+                }
+                distinct = 1 / distinct;
+                average += AverageOfSensor(values) * distinct;
+                count += distinct;
             }
 
-            return true;
+            if (count == 0) {
+                return 0;
+            }
+            return Math.Round((average / count), 2, MidpointRounding.AwayFromZero);
+        }
+
+        public double AverageOfSensor(List<double> values)
+        {
+            if (values.Count() == 0)
+            {
+                return 0;
+            }
+            double average = 0;
+            for (int i = 0; i < values.Count(); i++)
+            {
+                average += values[i];
+            }
+            return average / values.Count();
         }
     }
 }
-
