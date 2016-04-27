@@ -42,19 +42,18 @@ Iteracia 2 - 32 hodin
 
 	5.	Odhadnutie hodnot aj pre nemonitorovane oblasti – 20 hod
 	6.	Volba parametrov zobrazovania(Vlhkosť (pôdy/vzduchu), Teplota (denná/nočná), Rýchlosť vetra, Zrazky, Kvalita pody, Priame svetlo, Hlučnosť, Množstvo smogu) – 8 hod
-	7.	Nastavenie idealnych hodnot podla jednotlivych fatorov – 4 hod
+	7.	Voľba podla časoveho rozmedzia(datum od do) – 4 hod
 
 
-Iteracia 3 - 18 hodin
+Iteracia 3 - 14 hodin
 
 
-	8.	Voľba podla časoveho rozmedzia(datum od do) – 4 hod
-	9.	Zvolenie dolezitych faktorov – 4 hod
-	10.	Validacia vstupov z formularov – 9 hod
-	11.	Zobrazenie legendy k mape – 1 hod
+	8.	Zvolenie dolezitych faktorov – 4 hod
+	9.	Validacia vstupov z formularov – 9 hod
+	10.	Zobrazenie legendy k mape – 1 hod
 
 
-Spolu - 72 hodin
+Spolu - 68 hodin
 
 
 Špecifikácia:
