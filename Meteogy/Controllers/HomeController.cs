@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Meteogy.Models;
 
 namespace Meteogy.Controllers
 {
@@ -16,6 +17,9 @@ namespace Meteogy.Controllers
         [HttpPost]
         public ActionResult GetColorMap()
         {
+            //var dbContext = new DatabaseEntities();
+            //var measurement = from c in dbContext.Location select c;
+
             var result = new double[3][];
             result[0] = new double[5] { 0, 1, 2, 3, 4 };
             result[1] = new double[5] { 5, 6, 7, 8, 9 };

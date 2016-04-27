@@ -15,19 +15,37 @@
         <form>
             <div class="form-group">
                 <label for="UI_Lat">Latitude</label>
-                <input type="text" class="form-control" id="UI_Lat" placeholder="Latitude">
+                <input type="text" class="form-control" id="UI_Lat" placeholder="Latitude" required>
             </div>
             <div class="form-group">
                 <label for="UI_Lng">Longitude</label>
-                <input type="text" class="form-control" id="UI_Lng" placeholder="Longitude">
+                <input type="text" class="form-control" id="UI_Lng" placeholder="Longitude" required>
             </div>
             <div class="form-group">
                 <label for="UI_Width">Width</label>
-                <input type="text" class="form-control" id="UI_Width" placeholder="Width">
+                <input type="text" class="form-control" id="UI_Width" placeholder="Width" required>
             </div>
             <div class="form-group">
                 <label for="UI_Height">Height</label>
-                <input type="text" class="form-control" id="UI_Height" placeholder="Height">
+                <input type="text" class="form-control" id="UI_Height" placeholder="Height" required>
+            </div>
+            <div class="form-group">
+                <label for="UI_Species">Species</label>
+                <select class="form-control" id="UI_Species" required>
+                    <option disabled selected>Select any...</option>
+                    <option value="humidity">Humidity</option>
+                    <option value="temperature">Temperature</option>
+                    <option value="windSpeed">Wind speed</option>
+                    <option value="smog">Smog</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="UI_From">From</label>
+                <input type="datetime" class="form-control" id="UI_From" placeholder="Date" required>
+            </div>
+            <div class="form-group">
+                <label for="UI_To">To</label>
+                <input type="datetime" class="form-control" id="UI_To" placeholder="Date" required>
             </div>
         </form>
     </div>
