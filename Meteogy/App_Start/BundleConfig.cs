@@ -24,8 +24,13 @@ namespace Meteogy
                       "~/Scripts/respond.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
+                      "~/Content/bootstrap-datepicker.css",
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));
+
+            // Datepicker component
+            bundles.Add(new ScriptBundle("~/bundles/datepicker").Include(
+                      "~/Scripts/bootstrap-datepicker.js"));
         }
     }
 }

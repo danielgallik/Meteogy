@@ -11,42 +11,30 @@
         </div>
     </div>
     <div class="col-md-3">
-        <h1>Parameters</h1>
-        <form>
+        <h1>Formular</h1>
+        <hr />
+        <form id="UI_FormParameters" onsubmit="event.preventDefault(); ColorMapRequest(this);">
             <div class="form-group">
-                <label for="UI_Lat">Latitude</label>
-                <input type="text" class="form-control" id="UI_Lat" placeholder="Latitude" required>
-            </div>
-            <div class="form-group">
-                <label for="UI_Lng">Longitude</label>
-                <input type="text" class="form-control" id="UI_Lng" placeholder="Longitude" required>
-            </div>
-            <div class="form-group">
-                <label for="UI_Width">Width</label>
-                <input type="text" class="form-control" id="UI_Width" placeholder="Width" required>
-            </div>
-            <div class="form-group">
-                <label for="UI_Height">Height</label>
-                <input type="text" class="form-control" id="UI_Height" placeholder="Height" required>
-            </div>
-            <div class="form-group">
-                <label for="UI_Species">Species</label>
-                <select class="form-control" id="UI_Species" required>
-                    <option disabled selected>Select any...</option>
-                    <option value="humidity">Humidity</option>
+                <label for="UI_Parameter">Parameter</label>
+                <select class="form-control" id="UI_Parameter" name="parameter" required>
                     <option value="temperature">Temperature</option>
+                    <option value="humidity">Humidity</option>
                     <option value="windSpeed">Wind speed</option>
                     <option value="smog">Smog</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="UI_From">From</label>
-                <input type="datetime" class="form-control" id="UI_From" placeholder="Date" required>
+                <label for="UI_DateRange">Date Range</label>
+                <div class="input-daterange" id="datepicker">
+                    <div class="input-group">
+                        <span class="input-group-addon"><small>From</small></span>
+                        <input type="text" class="input-sm form-control" placeholder="mm/dd/yyyy" name="startDate" required />
+                        <span class="input-group-addon"><small>To</small></span>
+                        <input type="text" class="input-sm form-control" placeholder="mm/dd/yyyy" name="endDate" required />
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="UI_To">To</label>
-                <input type="datetime" class="form-control" id="UI_To" placeholder="Date" required>
-            </div>
+            <button type="submit" class="btn btn-default">Submit</button>
         </form>
     </div>
 </div>
@@ -60,8 +48,29 @@
         var width = 5.9;
 
         $(document).ready(function () {
-            var jsonObject = {};
+            InitDatePicker();
 
+        });
+
+        function InitDatePicker() {
+            $('#UI_FormParameters .input-daterange').datepicker({
+                autoclose: true,
+                todayHighlight: true
+            });
+        }
+
+        function ColorMapRequest(form) {
+            var jsonObject = {
+                "bounds": {
+                    "north": rectangle.getBounds().getNorthEast().lat().toString(),
+                    "east": rectangle.getBounds().getNorthEast().lng().toString(),
+                    "south": rectangle.getBounds().getSouthWest().lat().toString(),
+                    "west": rectangle.getBounds().getSouthWest().lng().toString()
+                },
+                "parameter": form["parameter"].value,
+                "startDate": form["startDate"].value,
+                "endDate": form["endDate"].value
+            };
 
             $.ajax({
                 url: "@Url.Action("GetColorMap")",
@@ -76,7 +85,7 @@
                     Draw(response.data);
                 }
             });
-        });
+        }
 
         function Draw(data) {
             var canvas = document.getElementById("UI_Canvas");
@@ -84,14 +93,13 @@
 
             var rectHeight = canvas.height / data.length;
             var rectWidth = canvas.width / data[0].length;
-            for (var i = 0; i < data.length; i++)
-            {
+            for (var i = 0; i < data.length; i++) {
                 for (var j = 0; j < data[i].length; j++) {
                     ctx.fillStyle = "rgb(" + (data[i][j] * 10).toString() + ",0,0)";
                     ctx.fillRect(j * rectWidth, i * rectHeight, rectWidth, rectHeight);
                 }
             }
-            
+
         }
 
         function calculateBounds() {
@@ -101,13 +109,6 @@
                 west: centerLatLng.lng - width / 2,
                 east: centerLatLng.lng + width / 2
             };
-        }
-
-        function updateForm() {
-            document.getElementById('UI_Lat').value = centerLatLng.lat;
-            document.getElementById('UI_Lng').value = centerLatLng.lng;
-            document.getElementById('UI_Width').value = width;
-            document.getElementById('UI_Height').value = height;
         }
 
         function initMap() {
@@ -130,7 +131,6 @@
                 centerLatLng.lng = sw.lng() + width / 2;
                 height = ne.lat() - sw.lat();
                 width = ne.lng() - sw.lng();
-                updateForm();
             });
 
             map.addListener('click', function (event) {
@@ -141,10 +141,7 @@
                 height = ne.lat() - sw.lat();
                 width = ne.lng() - sw.lng();
                 rectangle.setBounds(calculateBounds());
-                updateForm();
             });
-
-            updateForm();
         }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?callback=initMap" async defer></script>
