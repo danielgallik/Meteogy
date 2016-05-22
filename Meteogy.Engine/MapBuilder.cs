@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Device.Location;
+using System.Drawing;
 using System.Collections;
 
 namespace Meteogy.Engine
@@ -11,6 +12,7 @@ namespace Meteogy.Engine
     public class MapBuilder
     {
         private double[,] map;
+        private Color[,] colorMap;
         private GeoCoordinate[] corners;
         private Dictionary<Tuple<int, int>, List<double>> points = new Dictionary<Tuple<int, int>, List<double>>();
 
@@ -24,12 +26,26 @@ namespace Meteogy.Engine
             return map;
         }
 
+        public Color[,] GetColorMap(int opacity, double max, double min)
+        {
+            for (var i = 0; i < map.GetLength(0); i++)
+            {
+                for (var j = 0; j < map.GetLength(1); j++)
+                {
+                    colorMap[i,j] = ConvertToColor(map[i, j], opacity, max, min);
+                }
+            }
+
+            return colorMap;
+        }
+
         public MapBuilder(int width, int height, GeoCoordinate leftBot, GeoCoordinate rightTop)
         {
             width = (width < MIN_WIDTH) ? MIN_WIDTH : width;
             height = (width < MIN_HEIGHT) ? MIN_HEIGHT : height;
 
             map = new double[width, height];
+            colorMap = new Color[width, height];
 
             corners = new GeoCoordinate[2];
             corners[0] = leftBot;
@@ -93,8 +109,7 @@ namespace Meteogy.Engine
             {
                 for (int j = 0; j < map.GetLength(1); j++)
                 {
-                    map[i, j] = CalculCorrectPoint(i, j);       
-                    Console.WriteLine(map[i,j]);
+                    map[i, j] = CalculCorrectPoint(i, j);
                 }
             }
         }
@@ -107,7 +122,9 @@ namespace Meteogy.Engine
             {
                 Tuple<int, int> position = point.Key;
                 List<double> values = point.Value;
-                double distinct = Math.Abs(i - position.Item1) + Math.Abs(j-position.Item2);
+
+                double distinct = Math.Pow(Math.Pow(Math.Abs(i - position.Item1), 2) + Math.Pow(Math.Abs(j - position.Item2), 2), 2);
+
                 if (distinct == 0)
                 {
                     return AverageOfSensor(values);
@@ -135,6 +152,37 @@ namespace Meteogy.Engine
                 average += values[i];
             }
             return average / values.Count();
+        }
+
+        public Color ConvertToColor(double value, int opacity, double MAX, double MIN)
+        {
+            Color color = Color.FromArgb(255, 255, 255);
+
+            double QUAD = Math.Abs(MAX - MIN) / 4;
+            double STEP = 255 / QUAD;
+            double valueColor;
+
+            if (value >= MAX - QUAD)
+            {
+                valueColor = (value - MIN) - (QUAD * 3);
+                color = Color.FromArgb(opacity, 255, 255 - (int)Math.Round(valueColor * STEP), 0);
+            }
+            else if (value >= MAX - QUAD * 2)
+            {
+                valueColor = (value - MIN) - (QUAD * 2);
+                color = Color.FromArgb(opacity, (int)Math.Round(valueColor * STEP), 255, 0);
+            }
+            else if (value >= MAX - QUAD * 3)
+            {
+                valueColor = (value - MIN) - QUAD;
+                color = Color.FromArgb(opacity, 0, 255, 255 - (int)Math.Round(valueColor * STEP));
+            }
+            else
+            {
+                color = Color.FromArgb(opacity, 0, (int)Math.Round((value - MIN) * STEP), 255);
+            }
+
+            return color;
         }
     }
 }
