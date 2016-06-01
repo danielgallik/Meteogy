@@ -87,6 +87,24 @@
             });
         }
 
+        function AddLocation(lat, lng) {
+            var jsonObject = {
+                "lat": lat,
+                "lng": lng
+            };
+
+            $.ajax({
+                url: "@Url.Action("AddLocation")",
+                type: "POST",
+                data: JSON.stringify(jsonObject),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                error: function (response) {
+                    alert(response.responseText);
+                }
+            });
+        }
+
         function Draw(data) {
             var canvas = document.getElementById("UI_Canvas");
             var ctx = canvas.getContext("2d");
@@ -95,7 +113,7 @@
             var rectWidth = canvas.width / data[0].length;
             for (var i = 0; i < data.length; i++) {
                 for (var j = 0; j < data[i].length; j++) {
-                    ctx.fillStyle = "rgb(" + (data[i][j] * 10).toString() + ",0,0)";
+                    ctx.fillStyle = "rgb(" + (data[i][j][0]).toString() + "," + (data[i][j][1]).toString() + "," + (data[i][j][2]).toString() + ")";
                     ctx.fillRect(j * rectWidth, i * rectHeight, rectWidth, rectHeight);
                 }
             }
@@ -134,6 +152,7 @@
             });
 
             map.addListener('click', function (event) {
+                AddLocation(event.latLng.lat(), event.latLng.lng());
                 centerLatLng.lat = event.latLng.lat();
                 centerLatLng.lng = event.latLng.lng();
                 var ne = rectangle.getBounds().getNorthEast();

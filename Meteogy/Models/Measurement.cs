@@ -17,10 +17,10 @@ namespace Meteogy.Models
         public int Id { get; set; }
         public int LocationId { get; set; }
         public System.DateTime DateTime { get; set; }
-        public Nullable<decimal> Humidity { get; set; }
-        public Nullable<decimal> Temperature { get; set; }
-        public Nullable<decimal> Smog { get; set; }
-        public Nullable<decimal> WindSpeed { get; set; }
+        public Nullable<double> Humidity { get; set; }
+        public Nullable<double> Temperature { get; set; }
+        public Nullable<double> Smog { get; set; }
+        public Nullable<double> WindSpeed { get; set; }
     
         public virtual Location Location { get; set; }
     }

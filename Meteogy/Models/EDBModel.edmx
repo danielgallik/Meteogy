@@ -4,48 +4,48 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="DatabaseModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-  <EntityContainer Name="DatabaseModelStoreContainer">
-    <EntitySet Name="Location" EntityType="DatabaseModel.Store.Location" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="Measurement" EntityType="DatabaseModel.Store.Measurement" store:Type="Tables" Schema="dbo" />
-    <AssociationSet Name="FK__Measureme__Locat__01142BA1" Association="DatabaseModel.Store.FK__Measureme__Locat__01142BA1">
-      <End Role="Location" EntitySet="Location" />
-      <End Role="Measurement" EntitySet="Measurement" />
-    </AssociationSet>
-  </EntityContainer>
-  <EntityType Name="Location">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="Latitude" Type="varchar" Nullable="false" MaxLength="50" />
-    <Property Name="Longitude" Type="varchar" Nullable="false" MaxLength="50" />
-  </EntityType>
-  <EntityType Name="Measurement">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="LocationId" Type="int" Nullable="false" />
-    <Property Name="DateTime" Type="datetime" Nullable="false" />
-    <Property Name="Humidity" Type="decimal" Nullable="true" Precision="3" Scale="2" />
-    <Property Name="Temperature" Type="decimal" Nullable="true" Precision="3" Scale="2" />
-    <Property Name="Smog" Type="decimal" Nullable="true" Precision="3" Scale="2" />
-    <Property Name="WindSpeed" Type="decimal" Nullable="true" Precision="3" Scale="2" />
-  </EntityType>
-  <Association Name="FK__Measureme__Locat__01142BA1">
-    <End Role="Location" Type="DatabaseModel.Store.Location" Multiplicity="1" />
-    <End Role="Measurement" Type="DatabaseModel.Store.Measurement" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Location">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="Measurement">
-        <PropertyRef Name="LocationId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-</Schema></edmx:StorageModels>
+    <Schema Namespace="DatabaseModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Location">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Latitude" Type="decimal" Precision="20" Scale="17" Nullable="false" />
+          <Property Name="Longitude" Type="decimal" Precision="20" Scale="17" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Measurement">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="LocationId" Type="int" Nullable="false" />
+          <Property Name="DateTime" Type="datetime" Nullable="false" />
+          <Property Name="Humidity" Type="float" />
+          <Property Name="Temperature" Type="float" />
+          <Property Name="Smog" Type="float" />
+          <Property Name="WindSpeed" Type="float" />
+        </EntityType>
+        <Association Name="FK__Measureme__Locat__01142BA1">
+          <End Role="Location" Type="Self.Location" Multiplicity="1" />
+          <End Role="Measurement" Type="Self.Measurement" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Location">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Measurement">
+              <PropertyRef Name="LocationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="DatabaseModelStoreContainer">
+          <EntitySet Name="Location" EntityType="Self.Location" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Measurement" EntityType="Self.Measurement" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__Measureme__Locat__01142BA1" Association="Self.FK__Measureme__Locat__01142BA1">
+            <End Role="Location" EntitySet="Location" />
+            <End Role="Measurement" EntitySet="Measurement" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="DatabaseModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -54,8 +54,8 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Latitude" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Longitude" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Latitude" Type="Decimal" Precision="20" Scale="17" Nullable="false" />
+          <Property Name="Longitude" Type="Decimal" Precision="20" Scale="17" Nullable="false" />
           <NavigationProperty Name="Measurement" Relationship="Self.FK__Measureme__Locat__01142BA1" FromRole="Location" ToRole="Measurement" />
         </EntityType>
         <EntityType Name="Measurement">
@@ -65,10 +65,10 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="LocationId" Type="Int32" Nullable="false" />
           <Property Name="DateTime" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="Humidity" Type="Decimal" Precision="3" Scale="2" />
-          <Property Name="Temperature" Type="Decimal" Precision="3" Scale="2" />
-          <Property Name="Smog" Type="Decimal" Precision="3" Scale="2" />
-          <Property Name="WindSpeed" Type="Decimal" Precision="3" Scale="2" />
+          <Property Name="Humidity" Type="Double" />
+          <Property Name="Temperature" Type="Double" />
+          <Property Name="Smog" Type="Double" />
+          <Property Name="WindSpeed" Type="Double" />
           <NavigationProperty Name="Location" Relationship="Self.FK__Measureme__Locat__01142BA1" FromRole="Measurement" ToRole="Location" />
         </EntityType>
         <Association Name="FK__Measureme__Locat__01142BA1">
