@@ -22,16 +22,40 @@ namespace Meteogy.Controllers
         {
             int width = 200;
             int height = 100;
-            double south = Convert.ToDouble(form.Bounds.South, CultureInfo.InvariantCulture);
-            double west = Convert.ToDouble(form.Bounds.West, CultureInfo.InvariantCulture);
-            double north = Convert.ToDouble(form.Bounds.North, CultureInfo.InvariantCulture);
-            double east = Convert.ToDouble(form.Bounds.East, CultureInfo.InvariantCulture);
-            GeoCoordinate leftBot = new GeoCoordinate(south, west);
-            GeoCoordinate rightTop = new GeoCoordinate(north, east);
+            GeoCoordinate leftBot = new GeoCoordinate(form.Bounds.GetSouthDouble, form.Bounds.GetWestDouble);
+            GeoCoordinate rightTop = new GeoCoordinate(form.Bounds.GetNorthDouble, form.Bounds.GetEastDouble);
             MapBuilder builder = new MapBuilder(width, height, leftBot, rightTop);
 
             var measurements = DbQueries.GetMeasurements(form);
 
+            foreach(Measurement item in measurements)
+            {
+                switch (form.Parameter)
+                {
+                    case Parameter.Humidity:
+                        builder.Insert(
+                            new GeoCoordinate(Convert.ToDouble(item.Location.Latitude), Convert.ToDouble(item.Location.Longitude)),
+                            item.Humidity.Value);
+                        break;
+                    case Parameter.Smog:
+                        builder.Insert(
+                            new GeoCoordinate(Convert.ToDouble(item.Location.Latitude), Convert.ToDouble(item.Location.Longitude)),
+                            item.Smog.Value);
+                        break;
+                    case Parameter.Temperature:
+                        builder.Insert(
+                            new GeoCoordinate(Convert.ToDouble(item.Location.Latitude), Convert.ToDouble(item.Location.Longitude)),
+                            item.Temperature.Value);
+                        break;
+                    case Parameter.WindSpeed:
+                        builder.Insert(
+                            new GeoCoordinate(Convert.ToDouble(item.Location.Latitude), Convert.ToDouble(item.Location.Longitude)),
+                            item.WindSpeed.Value);
+                        break;
+                    default:
+                        return Json(new { status = 400, message = "Parameter is incorrect" });
+                }
+            }
             measurements.ForEach(
                 x => builder.Insert(
                     new GeoCoordinate(

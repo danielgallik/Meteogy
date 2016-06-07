@@ -82,7 +82,12 @@
                     alert(response.responseText);
                 },
                 success: function (response) {
-                    Draw(response.data);
+                    if (response.status == 200) {
+                        Draw(response.data);
+                    }
+                    else {
+                        alert(response.message);
+                    }
                 }
             });
         }
