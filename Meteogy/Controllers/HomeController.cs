@@ -20,64 +20,83 @@ namespace Meteogy.Controllers
         [HttpPost]
         public ActionResult GetColorMap(FormParameters form)
         {
-            int width = 200;
-            int height = 100;
-            GeoCoordinate leftBot = new GeoCoordinate(form.Bounds.GetSouthDouble, form.Bounds.GetWestDouble);
-            GeoCoordinate rightTop = new GeoCoordinate(form.Bounds.GetNorthDouble, form.Bounds.GetEastDouble);
-            MapBuilder builder = new MapBuilder(width, height, leftBot, rightTop);
-
-            var measurements = DbQueries.GetMeasurements(form);
-
-            foreach(Measurement item in measurements)
+            try
             {
+                int width = 200;
+                int height = 100;
+                GeoCoordinate leftBot = new GeoCoordinate(form.Bounds.GetSouthDouble, form.Bounds.GetWestDouble);
+                GeoCoordinate rightTop = new GeoCoordinate(form.Bounds.GetNorthDouble, form.Bounds.GetEastDouble);
+                MapBuilder builder = new MapBuilder(width, height, leftBot, rightTop);
+
+                var measurements = DbQueries.GetMeasurements(form);
+
+                if (measurements.Count == 0)
+                {
+                    return Json(new { status = 204, message = "No measurement values found." });
+                }
+
+                foreach (Measurement item in measurements)
+                {
+                    switch (form.Parameter)
+                    {
+                        case Parameter.Humidity:
+                            builder.Insert(new GeoCoordinate(Convert.ToDouble(item.Location.Latitude), Convert.ToDouble(item.Location.Longitude)), item.Humidity.Value * 100);
+                            break;
+                        case Parameter.Smog:
+                            builder.Insert(new GeoCoordinate(Convert.ToDouble(item.Location.Latitude), Convert.ToDouble(item.Location.Longitude)), item.Smog.Value * 100);
+                            break;
+                        case Parameter.Temperature:
+                            builder.Insert(new GeoCoordinate(Convert.ToDouble(item.Location.Latitude), Convert.ToDouble(item.Location.Longitude)), item.Temperature.Value);
+                            break;
+                        case Parameter.WindSpeed:
+                            builder.Insert(new GeoCoordinate(Convert.ToDouble(item.Location.Latitude), Convert.ToDouble(item.Location.Longitude)), item.WindSpeed.Value);
+                            break;
+                    }
+                }
+
+                builder.SpreadPoints();
+
+                double max = 0;
+                double min = 0;
+                string units = "";
                 switch (form.Parameter)
                 {
                     case Parameter.Humidity:
-                        builder.Insert(
-                            new GeoCoordinate(Convert.ToDouble(item.Location.Latitude), Convert.ToDouble(item.Location.Longitude)),
-                            item.Humidity.Value);
-                        break;
                     case Parameter.Smog:
-                        builder.Insert(
-                            new GeoCoordinate(Convert.ToDouble(item.Location.Latitude), Convert.ToDouble(item.Location.Longitude)),
-                            item.Smog.Value);
+                        max = 100;
+                        min = 0;
+                        units = "%";
                         break;
                     case Parameter.Temperature:
-                        builder.Insert(
-                            new GeoCoordinate(Convert.ToDouble(item.Location.Latitude), Convert.ToDouble(item.Location.Longitude)),
-                            item.Temperature.Value);
+                        max = 50;
+                        min = -30;
+                        units = "°C";
                         break;
                     case Parameter.WindSpeed:
-                        builder.Insert(
-                            new GeoCoordinate(Convert.ToDouble(item.Location.Latitude), Convert.ToDouble(item.Location.Longitude)),
-                            item.WindSpeed.Value);
+                        max = 200;
+                        min = 0;
+                        units = "km/h";
                         break;
-                    default:
-                        return Json(new { status = 400, message = "Parameter is incorrect" });
                 }
-            }
-            measurements.ForEach(
-                x => builder.Insert(
-                    new GeoCoordinate(
-                        Convert.ToDouble(x.Location.Latitude), 
-                        Convert.ToDouble(x.Location.Longitude)), 
-                    x.Temperature.Value));
 
-            builder.SpreadPoints();
-
-            var map = builder.GetColorMap(255, 30, -30);
-            int[][][] result = new int[height][][];
-            for(int i = 0; i < height; i++)
-            {
-                result[i] = new int[width][];
-                for (int j = 0; j < width; j++)
+                var map = builder.GetColorMap(255, max, min);
+                return Json(new
                 {
-                    int x = width - j - 1;
-                    int y = height - i - 1;
-                    result[i][j] = new int[3] { map[x, y].R, map[x, y].G , map[x, y].B };
-                }
+                    status = 200,
+                    message = "Success",
+                    map = ObjectConvertor.FromColorMatrix(map),
+                    legend = new
+                    {
+                        Parameter = form.Parameter.ToString(),
+                        Min = String.Format("{0}{1}", min, units),
+                        Max = String.Format("{0}{1}", max, units)
+                    }
+                });
             }
-            return Json(new { status = 200, message = "Success", data = result });
+            catch
+            {
+                return Json(new { status = 400, message = "Undefined error." });
+            }
         }
     }
 }

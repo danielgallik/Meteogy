@@ -1,28 +1,45 @@
 ﻿@{
     ViewBag.Title = "Home Page";
 }
-
 <div class="row">
+    <!--Maps Section Start-->
     <div class="col-md-9">
         <h1>Map</h1>
+        <!--Google Map-->
         <div id="map" style="width:100%; height:400px;"></div>
+        <!--Color Map Section Start-->
+        <!--Color Map-->
         <div style="text-align:center; padding: 10px 0;">
-            <canvas id="UI_Canvas" style="width:500px; height:250px; border: solid 2px #CCC; margin: 0 auto;"></canvas>
+            <canvas id="UI_Canvas" style="width:500px; height:250px; margin: 0 auto;"></canvas>            
+            <!--Color Map Legend-->
+            <div id="UI_Legend" hidden>
+                <h4><span id="UI_LegendParameter">Temperature</span>:</h4>
+                <div style="min-width: 560px">
+                    <span id="UI_LegendMax">50</span>
+                    <img width="500" height="20" src="~/Content/palette.png" />
+                    <span id="UI_LegendMin">-30</span>
+                </div>
+            </div>
         </div>
+        <!--Color Map Section End-->
     </div>
+    <!--Maps Section End-->
+    <!--Formular Section Start-->
     <div class="col-md-3">
         <h1>Formular</h1>
         <hr />
         <form id="UI_FormParameters" onsubmit="event.preventDefault(); ColorMapRequest(this);">
+            <!--Parameter Select-->
             <div class="form-group">
                 <label for="UI_Parameter">Parameter</label>
                 <select class="form-control" id="UI_Parameter" name="parameter" required>
                     <option value="temperature">Temperature</option>
                     <option value="humidity">Humidity</option>
-                    <option value="windSpeed">Wind speed</option>
+                    <option value="windspeed">Wind speed</option>
                     <option value="smog">Smog</option>
                 </select>
             </div>
+            <!--Date Pickers-->
             <div class="form-group">
                 <label for="UI_DateRange">Date Range</label>
                 <div class="input-daterange" id="datepicker">
@@ -34,9 +51,15 @@
                     </div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-default">Submit</button>
+            <!--Submit Button-->
+            <div class="form-group">
+                <button type="submit" id="UI_ButtonSubmit" class="btn btn-default">Submit</button>
+            </div>
         </form>
+        <div id="UI_AlertFormWarning" class="alert alert-warning" role="alert" hidden></div>
+        <div id="UI_AlertFormError" class="alert alert-danger" role="alert" hidden></div>
     </div>
+    <!--Formular Section End-->
 </div>
 
 @section Scripts {
@@ -55,7 +78,8 @@
         function InitDatePicker() {
             $('#UI_FormParameters .input-daterange').datepicker({
                 autoclose: true,
-                todayHighlight: true
+                todayHighlight: true,
+                todayBtn: "linked"
             });
         }
 
@@ -71,7 +95,11 @@
                 "startDate": form["startDate"].value,
                 "endDate": form["endDate"].value
             };
-
+            $("#UI_AlertFormWarning").hide();
+            $("#UI_AlertFormError").hide();
+            var button = $("#UI_ButtonSubmit");
+            button.text("Loading...");
+            button.prop("disabled", true);
             $.ajax({
                 url: "@Url.Action("GetColorMap")",
                 type: "POST",
@@ -83,11 +111,21 @@
                 },
                 success: function (response) {
                     if (response.status == 200) {
-                        Draw(response.data);
+                        Draw(response.map);
+                        RefreshLegend(response.legend)
+                    }
+                    else if (response.status == 204) {
+                        $("#UI_AlertFormWarning").text(response.message);
+                        $("#UI_AlertFormWarning").show();
                     }
                     else {
-                        alert(response.message);
+                        $("#UI_AlertFormError").text(response.message);
+                        $("#UI_AlertFormError").show();
                     }
+                },
+                complete: function () {
+                    button.text("Submit");
+                    button.prop("disabled", false);
                 }
             });
         }
@@ -122,7 +160,13 @@
                     ctx.fillRect(j * rectWidth, i * rectHeight, rectWidth, rectHeight);
                 }
             }
+        }
 
+        function RefreshLegend(data) {
+            $("#UI_Legend").show();
+            $("#UI_LegendParameter").text(data["Parameter"]);
+            $("#UI_LegendMin").text(data["Min"]);
+            $("#UI_LegendMax").text(data["Max"]);
         }
 
         function calculateBounds() {

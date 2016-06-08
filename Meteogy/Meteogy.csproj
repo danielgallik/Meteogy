@@ -171,6 +171,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\FormParameters.cs" />
+    <Compile Include="Models\ObjectConvertor.cs" />
     <Compile Include="Models\Location.cs">
       <DependentUpon>EDBModel.tt</DependentUpon>
     </Compile>
@@ -185,6 +186,7 @@
     <Content Include="App_Data\Database_log.ldf">
       <DependentUpon>Database.mdf</DependentUpon>
     </Content>
+    <Content Include="Content\palette.png" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
