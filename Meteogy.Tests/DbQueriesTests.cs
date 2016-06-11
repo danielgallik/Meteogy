@@ -20,14 +20,14 @@ namespace Meteogy.Tests
         }
 
         [TestMethod]
-        public void SelectLocationsTest()
+        public void SelectAllLocationsTest()
         {
             var actual = DbQueries.GetLocations();
-            Assert.AreEqual(5, actual.Count);
+            Assert.AreEqual(6, actual.Count);
         }
 
         [TestMethod]
-        public void SelectAllMeasuremetsTest()
+        public void SelectMeasuremetsForAllLocationsTest()
         {
             var form = new FormParameters()
             {
@@ -37,7 +37,7 @@ namespace Meteogy.Tests
                 EndDate = "1/1/2017"
             };
             var actual = DbQueries.GetMeasurements(form);
-            Assert.AreEqual(5, actual.Count);
+            Assert.AreEqual(6, actual.Count);
         }
     }
 }
